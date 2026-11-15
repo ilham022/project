@@ -1,0 +1,270 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Dashboard personal finance untuk memantau pemasukan, pengeluaran, budget, dan target keuangan.">
+    <title>Personal Finance Dashboard</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+<div class="page-shell">
+
+    <header class="topbar">
+        <div class="brand-block">
+            <p class="eyebrow">Dashboard Keuangan</p>
+            <h1>Personal Finance</h1>
+        </div>
+
+        <div class="topbar-actions">
+            <div class="month-pill">
+                <span class="label">Tahun ini</span>
+                <strong>{{ nama_bulan }} {{ tahun }}</strong>
+            </div>
+
+            <button class="primary-btn" type="button">Upload</button>
+        </div>
+    </header>
+
+    <main class="dashboard">
+
+        <!-- RINGKASAN KEUANGAN -->
+        <section class="summary" aria-label="Ringkasan keuangan">
+
+            <article class="card card-income">
+                <div class="card-head">
+                    <span class="card-kicker">Pemasukan</span>
+                    <span class="icon positive">↗</span>
+                </div>
+                <h3>Total Pemasukan</h3>
+                <p class="amount-positive">{{ pemasukan|rupiah }}</p>
+                <small>Bulan ini</small>
+            </article>
+
+            <article class="card card-expense">
+                <div class="card-head">
+                    <span class="card-kicker">Pengeluaran</span>
+                    <span class="icon negative">↘</span>
+                </div>
+                <h3>Total Pengeluaran</h3>
+                <p class="amount-negative">{{ pengeluaran|rupiah }}</p>
+                <small>Bulan ini</small>
+            </article>
+
+            <article class="card card-balance">
+                <div class="card-head">
+                    <span class="card-kicker">Saldo</span>
+                    <span class="icon neutral">◎</span>
+                </div>
+                <h3>Saldo Bersih</h3>
+                <p>{{ saldo|rupiah }}</p>
+                <small>Bulan ini</small>
+            </article>
+
+            <article class="card card-savings">
+                <div class="card-head">
+                    <span class="card-kicker">Tabungan</span>
+                    <span class="icon warning">★</span>
+                </div>
+                <h3>Tabungan</h3>
+                <p>{{ tabungan|rupiah }}</p>
+                <small>Dialokasikan bulan ini</small>
+            </article>
+
+        </section>
+
+        <!-- FORM TRANSAKSI -->
+        <section class="panel form-panel">
+
+            <div class="panel-header">
+                <h2>Tambah Transaksi</h2>
+                <span class="mini-badge">Transaksi Baru</span>
+            </div>
+
+            <form class="transaction-form" action="/add" method="POST">
+
+                <div class="field">
+                    <label for="nama">Nama transaksi</label>
+                    <input
+                        id="nama"
+                        name="name"
+                        type="text"
+                        placeholder="Contoh: Gaji bulanan"
+                        required
+                    >
+                </div>
+
+                <div class="field">
+                    <label for="jumlah">Jumlah</label>
+                    <input
+                        id="jumlah"
+                        name="amount"
+                        type="number"
+                        min="1"
+                        step="1"
+                        placeholder="Contoh: 1500000"
+                        required
+                    >
+                </div>
+
+                <div class="field">
+                    <label for="kategori">Kategori</label>
+                    <select id="kategori" name="category" required>
+                        <option value="pemasukan">Pemasukan</option>
+                        <option value="pengeluaran">Pengeluaran</option>
+                        <option value="investasi">Investasi</option>
+                        <option value="tabungan">Tabungan</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label for="tanggal">Tanggal</label>
+                    <input
+                        id="tanggal"
+                        name="date"
+                        type="date"
+                        value="{{ tanggal_hari_ini }}"
+                        required
+                    >
+                </div>
+
+                <button class="primary-btn submit-btn" type="submit">Upload</button>
+
+            </form>
+        </section>
+
+        <!-- ALOKASI DANA DAN TARGET -->
+        <section class="content-grid">
+
+            <article class="panel budget-panel">
+                <div class="panel-header">
+                    <h2>Alokasi Dana Bulan Ini</h2>
+                    <span class="badge income">{{ nama_bulan }}</span>
+                </div>
+
+                <ul class="budget-list">
+
+                    {% for item in alokasi %}
+                    <li class="budget-item">
+
+                        <div class="budget-meta">
+                            <span>{{ item.name }}</span>
+                            <strong>{{ item.amount|rupiah }}</strong>
+                        </div>
+
+                        <div class="progress-bar">
+                            <span class="{{ item.class }}"
+                                style="width:{{ item.percentage }}%">
+                            </span>
+                        </div>
+
+                        <small>{{ item.percentage }}% dari pemasukan</small>
+
+                    </li>
+                    {% endfor %}
+
+                </ul>
+            </article>
+
+            <article class="panel goals-panel">
+                <div class="panel-header">
+                    <h2>Target Keuangan</h2>
+                    <span class="badge neutral">Segera hadir</span>
+                </div>
+
+                <div class="empty-state">
+                    <span class="empty-state-icon" aria-hidden="true">◎</span>
+                    <strong>Belum ada target keuangan</strong>
+                    <p>Fitur target akan tersedia di pengembangan berikutnya.</p>
+                </div>
+            </article>
+
+        </section>
+
+        <!-- INSIGHT -->
+        <section class="insights-grid">
+
+            <div class="insight-box">
+                <span>Cash Flow</span>
+                <strong>{{ cashflow|rupiah }}</strong>
+                <small>Pemasukan dikurangi pengeluaran</small>
+            </div>
+
+            <div class="insight-box">
+                <span>Jumlah Transaksi</span>
+                <strong>{{ jumlah_transaksi }}</strong>
+                <small>Bulan ini</small>
+            </div>
+
+            <div class="insight-box">
+                <span>Persentase Menabung</span>
+                <strong>{{ persentase_tabungan }}%</strong>
+                <small>Tabungan dibanding pemasukan</small>
+            </div>
+
+            <div class="insight-box">
+                <span>Investasi</span>
+                <strong>{{ investasi|rupiah }}</strong>
+                <small>{{ persentase_investasi }}% dari pemasukan</small>
+            </div>
+
+        </section>
+
+        <!-- RIWAYAT TRANSAKSI -->
+        <section class="panel history">
+
+            <div class="panel-header">
+                <h2>Riwayat Transaksi</h2>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tanggal</th>
+                        <th>Nama</th>
+                        <th>Kategori</th>
+                        <th>Status</th>
+                        <th>Jumlah</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for transaksi in transaksi_list %}
+                    <tr>
+
+                        <td>{{ transaksi.date }}</td>
+
+                        <td>{{ transaksi.name }}</td>
+
+                        <td>
+                            <span class="badge {{ 'income' if transaksi.category == 'pemasukan' else 'expense' if transaksi.category == 'pengeluaran' else 'neutral' }}">
+                                {{ transaksi.category|title }}
+                            </span>
+                        </td>
+
+                        <td>Berhasil</td>
+
+                        <td class="{{ 'amount-positive' if transaksi.category == 'pemasukan' else 'amount-negative' if transaksi.category == 'pengeluaran' else 'amount-neutral' }}">
+                            {{ '+' if transaksi.category == 'pemasukan' else '−' }}{{ transaksi.amount|rupiah }}
+                        </td>
+
+                    </tr>
+
+                    {% else %}
+                    <tr>
+                        <td colspan="5">Belum ada transaksi.</td>
+                    </tr>
+                    {% endfor %}
+
+                </tbody>
+            </table>
+
+        </section>
+
+    </main>
+</div>
+</body>
+</html>
